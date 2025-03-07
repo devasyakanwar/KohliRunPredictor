@@ -5,9 +5,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
 
-# ------------------------------------------------------------
+
 # 1) SAMPLE DATA (Including Kohli_Last_5_Scores as lists)
-# ------------------------------------------------------------
+
 data = {
     'Opponent': [
         "Australia", "Pakistan", "England", "New Zealand", "South Africa", 
@@ -54,9 +54,9 @@ data = {
 
 df = pd.DataFrame(data)
 
-# ------------------------------------------------------------
+
 # 2) EXPAND 'Kohli_Last_5_Scores' INTO 5 SEPARATE COLUMNS
-# ------------------------------------------------------------
+
 df[['Score1','Score2','Score3','Score4','Score5']] = pd.DataFrame(
     df['Kohli_Last_5_Scores'].tolist(),
     index=df.index
@@ -65,9 +65,9 @@ df[['Score1','Score2','Score3','Score4','Score5']] = pd.DataFrame(
 # Drop the original list column
 df.drop('Kohli_Last_5_Scores', axis=1, inplace=True)
 
-# ------------------------------------------------------------
+
 # 3) LABEL-ENCODE CATEGORICAL COLUMNS
-# ------------------------------------------------------------
+
 categorical_cols = [
     'Opponent', 'Match_Format', 'Venue', 
     'Pitch_Type', 'Weather', 'Toss_Decision', 
@@ -79,15 +79,15 @@ for col in categorical_cols:
     df[col] = le.fit_transform(df[col])
     label_encoders[col] = le
 
-# ------------------------------------------------------------
+
 # 4) PREPARE FEATURES (X) & TARGET (y)
-# ------------------------------------------------------------
+
 X = torch.tensor(df.drop('Predicted_Runs', axis=1).values, dtype=torch.float32)
 y = torch.tensor(df['Predicted_Runs'].values, dtype=torch.float32)
 
-# ------------------------------------------------------------
+
 # 5) DEFINE & TRAIN MODEL
-# ------------------------------------------------------------
+
 class KohliRunPredictor(nn.Module):
     def __init__(self, input_size):
         super().__init__()
@@ -115,9 +115,8 @@ for epoch in range(epochs):
     optimizer.step()
     loss_values.append(loss.item())
 
-# ------------------------------------------------------------
 # 6) STREAMLIT APP (UI DESIGN SIMILAR TO YOUR SCREENSHOT)
-# ------------------------------------------------------------
+
 st.set_page_config(page_title="Kohli Runs Predictor", layout="wide")
 
 # Main Title
@@ -151,9 +150,8 @@ for i in range(5):
 
 predict_button_col = bot_cols[5]
 with predict_button_col:
-    st.markdown("<br/>", unsafe_allow_html=True)  # add a little vertical space
+    st.markdown("<br/>", unsafe_allow_html=True)  
     if st.button("Predict Runs"):
-        # Convert user inputs to numeric via label encoders
         opp_val = label_encoders['Opponent'].transform([opponent])[0]
         mf_val = label_encoders['Match_Format'].transform([match_format])[0]
         ven_val = label_encoders['Venue'].transform([venue])[0]
@@ -175,7 +173,7 @@ with predict_button_col:
 
 st.markdown("---")
 
-# 6c) RED MESSAGE + TRAINING LOSS CURVE
+# 6c)TRAINING LOSS CURVE
 st.error("Slow Training Loss Curve (just like real-time model training!)")
 fig, ax = plt.subplots()
 ax.plot(range(epochs), loss_values, color='cyan', label='Loss')
